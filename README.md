@@ -1,48 +1,73 @@
-# NovaPlus Social 
+# NovaPlus Social 🚀
 
-**Platform:** Nova Plus Social 
-**Company:** Bayojid AI  
-**Tagline:** “Connecting the World. Powered by Bayojid AI.”
+![GitHub repo size](https://img.shields.io/github/repo-size/bbostami385-svg/NovaPlus-Social?style=flat-square)
+![GitHub contributors](https://img.shields.io/github/contributors/bbostami385-svg/NovaPlus-Social?style=flat-square)
+![GitHub stars](https://img.shields.io/github/stars/bbostami385-svg/NovaPlus-Social?style=flat-square)
+![GitHub forks](https://img.shields.io/github/forks/bbostami385-svg/NovaPlus-Social?style=flat-square)
 
 ---
 
-## Overview
+## 🌟 Overview
 
-NovaPlus Social is a modern, AI-powered social media platform designed to connect people across the world.  
-It integrates **Bayojid AI** for smart AI chat features and content recommendations, providing a unique and interactive user experience.  
+NovaPlus Social is a **modern AI-powered social media platform** designed to connect people worldwide.  
+It includes **Bayojid AI** integration for smart AI chat, content recommendations, and interactive experiences.
 
-- User-friendly interface for web and mobile  
-- AI Chat powered by Bayojid AI  
 - Real-time posts, likes, comments, and follow system  
-- Secure user authentication using Firebase  
+- AI Chat powered by Bayojid AI  
+- Secure user authentication  
+- Fast and modern UI for web and mobile  
 
 ---
 
-## Features
+## 📱 App Logo
 
-### Social Media
-- Signup / Login  
-- Profile Management  
-- Post Creation & Feed  
-- Likes, Comments, and Follow System  
-
-### AI Features
-- Bayojid AI Chat Assistant  
-- Content Recommendation & Auto Replies  
-- Smart Moderation (Optional)  
-
-### Technology Stack
-- Frontend: React.js / Next.js  
-- Backend: Node.js + Express  
-- Database: Firebase Firestore  
-- AI: OpenAI API (Bayojid AI)  
-- Deployment: Vercel (Frontend), Render / Termux (Backend)  
+![NovaPlus Logo](assets/logo.png)
 
 ---
 
-## Installation (Development)
+## 🚀 Screenshots
+
+### Splash Screen
+![Splash Screen](assets/splash.png)
+
+### Login Screen
+![Login Screen](assets/login.png)
+
+### Signup Screen
+![Signup Screen](assets/login.png) <!-- Use the same login_logo.png if needed -->
+
+### Feed Screen
+![Feed Screen](assets/feed.png)
+
+### Chat Screen
+![Chat Screen](assets/chat.png)
+
+---
+
+## ⚙️ Features
+
+- User Authentication (Login & Signup)  
+- Social Feed with Posts, Likes & Comments  
+- AI Chat Assistant powered by Bayojid AI  
+- Modern & Responsive UI  
+- Node.js Backend with Express  
+- MongoDB Database  
+
+---
+
+## 🛠 Technology Stack
+
+**Frontend:** React.js  
+**Backend:** Node.js, Express  
+**Database:** MongoDB  
+**AI:** Bayojid AI / OpenAI API  
+**Deployment:** Vercel (Frontend), Render / Termux (Backend)  
+
+---
+
+## 💻 Installation (Development)
 
 1. Clone the repository:
-
 ```bash
-git clone https://github.com/YOUR_USERNAME/nova-plus.git
+git clone https://github.com/bbostami385-svg/NovaPlus-Social.git
+cd NovaPlus-Social
