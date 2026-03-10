@@ -8,11 +8,10 @@ require("dotenv").config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 
-// User Model
+// User Schema
 const UserSchema = new mongoose.Schema({
   name: String,
   email: { type: String, unique: true },
@@ -24,11 +23,10 @@ const User = mongoose.model("User", UserSchema);
 
 // Signup
 app.post("/api/auth/signup", async (req, res) => {
-  const { name, email, password } = req.body;
-
   try {
-    const existingUser = await User.findOne({ email });
+    const { name, email, password } = req.body;
 
+    const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ msg: "Email already exists" });
     }
@@ -52,9 +50,9 @@ app.post("/api/auth/signup", async (req, res) => {
 
 // Login
 app.post("/api/auth/login", async (req, res) => {
-  const { email, password } = req.body;
-
   try {
+    const { email, password } = req.body;
+
     const user = await User.findOne({ email });
 
     if (!user) {
@@ -94,7 +92,6 @@ mongoose.connect(process.env.MONGO_URI)
 .then(() => console.log("MongoDB Connected"))
 .catch(err => console.log(err));
 
-// Server Start
 app.listen(PORT, () => {
   console.log("Server running on port " + PORT);
 });
