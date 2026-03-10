@@ -1,12 +1,28 @@
 import React from "react";
-import SplashLogo from "../assets/splash_logo.png";
 
-function Splash() {
-  return (
-    <div style={{ textAlign: "center", background: "#000", height: "100vh" }}>
-      <img src={SplashLogo} alt="Splash Logo" style={{ width: "200px", marginTop: "40vh" }} />
+function Splash(){
+
+  return(
+
+    <div style={{
+      textAlign:"center",
+      marginTop:"120px"
+    }}>
+
+      <img
+      src="/assets/logo.png"
+      width="120"
+      alt="NovaPlus"
+      />
+
+      <h1>NovaPlus Social</h1>
+
+      <p>Connecting the World 🚀</p>
+
     </div>
+
   );
+
 }
 
 export default Splash;
