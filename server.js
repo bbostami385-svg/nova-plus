@@ -11,7 +11,7 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// User Schema
+// MongoDB User Schema
 const UserSchema = new mongoose.Schema({
   name: String,
   email: { type: String, unique: true },
@@ -21,36 +21,42 @@ const UserSchema = new mongoose.Schema({
 
 const User = mongoose.model("User", UserSchema);
 
-// Signup
+
+// Signup Route
 app.post("/api/auth/signup", async (req, res) => {
   try {
+
     const { name, email, password } = req.body;
 
     const existingUser = await User.findOne({ email });
+
     if (existingUser) {
       return res.status(400).json({ msg: "Email already exists" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = new User({
+    const user = new User({
       name,
       email,
       password: hashedPassword
     });
 
-    await newUser.save();
+    await user.save();
 
-    res.status(201).json({ msg: "User created successfully" });
+    res.json({ msg: "Signup successful" });
 
   } catch (err) {
     res.status(500).json({ msg: "Server error" });
   }
 });
 
-// Login
+
+// Login Route
 app.post("/api/auth/login", async (req, res) => {
+
   try {
+
     const { email, password } = req.body;
 
     const user = await User.findOne({ email });
@@ -62,7 +68,7 @@ app.post("/api/auth/login", async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
-      return res.status(400).json({ msg: "Invalid password" });
+      return res.status(400).json({ msg: "Wrong password" });
     }
 
     const token = jwt.sign(
@@ -82,15 +88,18 @@ app.post("/api/auth/login", async (req, res) => {
   }
 });
 
+
 // Test Route
 app.get("/", (req, res) => {
-  res.send("NovaPlus Social Backend Running 🚀");
+  res.send("NovaPlus Backend Running 🚀");
 });
+
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGO_URI)
 .then(() => console.log("MongoDB Connected"))
 .catch(err => console.log(err));
+
 
 app.listen(PORT, () => {
   console.log("Server running on port " + PORT);
