@@ -1,29 +1,36 @@
-import React from "react";
+import React, { useState } from "react";
 
 function Feed(){
 
-  return(
+  const [post,setPost] = useState("");
+  const [posts,setPosts] = useState([]);
 
+  const addPost = () => {
+    setPosts([...posts, post]);
+    setPost("");
+  };
+
+  return(
     <div style={{textAlign:"center"}}>
 
       <h2>NovaPlus Feed</h2>
 
+      <input
+        placeholder="Write something..."
+        value={post}
+        onChange={(e)=>setPost(e.target.value)}
+      />
+
+      <button onClick={addPost}>Post</button>
+
       <div>
-
-        <p><b>User1:</b> Welcome to NovaPlus 🚀</p>
-
-      </div>
-
-      <div>
-
-        <p><b>User2:</b> This is our new social network</p>
-
+        {posts.map((p,i)=>(
+          <p key={i}>{p}</p>
+        ))}
       </div>
 
     </div>
-
   );
-
 }
 
 export default Feed;
