@@ -2,7 +2,6 @@
   "name": "novaplus-social",
   "version": "1.0.0",
   "private": true,
-  "description": "NovaPlus Social Media Platform",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build"
