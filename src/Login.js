@@ -4,12 +4,35 @@ function Login({ goToSignup, goToFeed }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = () => {
-    // temporary login simulation
-    if (email && password) {
-      goToFeed();
-    } else {
+  const handleLogin = async () => {
+    if (!email || !password) {
       alert("Enter email and password");
+      return;
+    }
+
+    try {
+      const res = await fetch("https://novaplus-social.onrender.com/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        // ✅ token save
+        localStorage.setItem("token", data.token);
+
+        alert("Login successful ✅");
+        goToFeed();
+      } else {
+        alert(data.msg || "Login failed ❌");
+      }
+
+    } catch (err) {
+      alert("Server error ❌");
     }
   };
 
