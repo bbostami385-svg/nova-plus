@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 function Feed() {
   const [posts, setPosts] = useState([]);
   const [text, setText] = useState("");
+  const [category, setCategory] = useState("all");
 
   // -----------------------
   // Get Posts
@@ -38,7 +39,9 @@ function Feed() {
         },
         body: JSON.stringify({
           text,
-          image: ""
+          image: "",
+          video: "",
+          category
         })
       });
 
@@ -80,54 +83,118 @@ function Feed() {
     }
   };
 
-  return (
-    <div style={{ textAlign: "center", padding: "20px" }}>
-      <h2>Feed 🚀</h2>
+  // -----------------------
+  // FILTER (YouTube style)
+  // -----------------------
+  const filteredPosts =
+    category === "all"
+      ? posts
+      : posts.filter((p) => p.category === category);
 
-      {/* ---------------- Create Post UI ---------------- */}
+  return (
+    <div style={{ padding: "20px", textAlign: "center" }}>
+
+      <h2>NovaPlus Feed 🚀</h2>
+
+      {/* ---------------- CATEGORY BAR (YouTube style) ---------------- */}
+      <div style={{ marginBottom: "15px" }}>
+        {["all", "news", "funny", "gaming", "music", "education"].map((cat) => (
+          <button
+            key={cat}
+            onClick={() => setCategory(cat)}
+            style={{
+              margin: "5px",
+              padding: "6px 12px",
+              borderRadius: "20px",
+              border: "none",
+              background: category === cat ? "black" : "#ccc",
+              color: category === cat ? "white" : "black",
+              cursor: "pointer"
+            }}
+          >
+            {cat}
+          </button>
+        ))}
+      </div>
+
+      {/* ---------------- CREATE POST ---------------- */}
       <div style={{ marginBottom: "20px" }}>
         <input
           type="text"
           placeholder="What's on your mind?"
           value={text}
           onChange={(e) => setText(e.target.value)}
-          style={{ padding: "8px", width: "250px" }}
+          style={{ padding: "10px", width: "250px" }}
         />
+
         <button onClick={createPost} style={{ marginLeft: "10px" }}>
           Post 🚀
         </button>
       </div>
 
-      {/* ---------------- Posts ---------------- */}
-      {posts.length === 0 ? (
-        <p>No posts yet...</p>
+      {/* ---------------- POSTS FEED ---------------- */}
+      {filteredPosts.length === 0 ? (
+        <p>No posts found 😢</p>
       ) : (
-        posts.map((post) => (
+        filteredPosts.map((post) => (
           <div
             key={post._id}
             style={{
-              border: "1px solid gray",
-              margin: "10px",
-              padding: "10px"
+              maxWidth: "500px",
+              margin: "15px auto",
+              border: "1px solid #ddd",
+              borderRadius: "10px",
+              padding: "15px",
+              textAlign: "left",
+              background: "#fff"
             }}
           >
-            <p>{post.text}</p>
 
-            <small>
+            {/* USER CONTENT */}
+            <p style={{ fontSize: "16px" }}>{post.text}</p>
+
+            {/* VIDEO SUPPORT (YouTube style ready) */}
+            {post.video && (
+              <video width="100%" controls style={{ borderRadius: "10px" }}>
+                <source src={post.video} />
+              </video>
+            )}
+
+            {/* IMAGE SUPPORT (Instagram style ready) */}
+            {post.image && (
+              <img
+                src={post.image}
+                alt=""
+                style={{ width: "100%", borderRadius: "10px" }}
+              />
+            )}
+
+            <small style={{ color: "gray" }}>
               {new Date(post.createdAt).toLocaleString()}
             </small>
 
             <br />
 
+            {/* LIKE BUTTON */}
             <button
               onClick={() => likePost(post._id)}
-              style={{ marginTop: "10px" }}
+              style={{
+                marginTop: "10px",
+                padding: "5px 10px",
+                border: "none",
+                background: "#ff4444",
+                color: "white",
+                borderRadius: "5px",
+                cursor: "pointer"
+              }}
             >
               ❤️ Like ({post.likes.length})
             </button>
+
           </div>
         ))
       )}
+
     </div>
   );
 }
