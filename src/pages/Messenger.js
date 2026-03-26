@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 function Messenger() {
   const [userId, setUserId] = useState("");
@@ -8,28 +8,37 @@ function Messenger() {
   const token = localStorage.getItem("token");
 
   const loadMessages = async () => {
-    const res = await fetch(`https://novaplus-social.onrender.com/api/messages/${userId}`, {
-      headers: { Authorization: "Bearer " + token }
-    });
-    const data = await res.json();
-    setMessages(data);
+    try {
+      const res = await fetch(`https://novaplus-social.onrender.com/api/messages/${userId}`, {
+        headers: { Authorization: "Bearer " + token }
+      });
+
+      const data = await res.json();
+      setMessages(data || []);
+    } catch (err) {
+      console.log("Message load error");
+    }
   };
 
   const sendMessage = async () => {
-    await fetch("https://novaplus-social.onrender.com/api/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + token
-      },
-      body: JSON.stringify({
-        receiverId: userId,
-        text
-      })
-    });
+    try {
+      await fetch("https://novaplus-social.onrender.com/api/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token
+        },
+        body: JSON.stringify({
+          receiverId: userId,
+          text
+        })
+      });
 
-    setText("");
-    loadMessages();
+      setText("");
+      loadMessages();
+    } catch (err) {
+      console.log("Send error");
+    }
   };
 
   return (
