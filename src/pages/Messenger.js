@@ -15,12 +15,14 @@ function Messenger() {
 
       const data = await res.json();
       setMessages(data || []);
-    } catch (err) {
-      console.log("Message load error");
+    } catch {
+      alert("Error loading messages");
     }
   };
 
   const sendMessage = async () => {
+    if (!text) return;
+
     try {
       await fetch("https://novaplus-social.onrender.com/api/messages", {
         method: "POST",
@@ -36,8 +38,8 @@ function Messenger() {
 
       setText("");
       loadMessages();
-    } catch (err) {
-      console.log("Send error");
+    } catch {
+      alert("Send failed");
     }
   };
 
@@ -53,9 +55,19 @@ function Messenger() {
 
       <button onClick={loadMessages}>Load Chat</button>
 
-      <div style={{ border: "1px solid gray", marginTop: "10px", padding: "10px", height: "300px", overflow: "auto" }}>
+      <div style={{
+        border: "1px solid gray",
+        marginTop: "10px",
+        padding: "10px",
+        height: "300px",
+        overflowY: "scroll"
+      }}>
         {messages.map((m, i) => (
-          <p key={i}><b>{m.senderId}</b>: {m.text}</p>
+          <div key={i} style={{
+            textAlign: m.senderId === userId ? "left" : "right"
+          }}>
+            <p>{m.text}</p>
+          </div>
         ))}
       </div>
 
