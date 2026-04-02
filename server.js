@@ -5,7 +5,20 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
+// 🔥 NEW
+const http = require("http");
+const { Server } = require("socket.io");
+
 const app = express();
+const server = http.createServer(app);
+
+// 🔥 SOCKET
+const io = new Server(server, {
+  cors: {
+    origin: "*"
+  }
+});
+
 const PORT = process.env.PORT || 5000;
 
 // -----------------------
@@ -108,7 +121,7 @@ app.post("/api/auth/login", async (req, res) => {
 });
 
 // -----------------------
-// USERS (Follow / Friend / Mode)
+// USERS
 // -----------------------
 app.post("/api/users/:id/follow", auth, async (req, res) => {
   const user = await User.findById(req.params.id);
@@ -133,8 +146,10 @@ app.post("/api/users/:id/add-friend", auth, async (req, res) => {
   const target = await User.findById(req.params.id);
   const me = await User.findById(req.user.id);
 
-  target.friendRequests.push(me._id);
-  me.sentRequests.push(target._id);
+  if (!target.friendRequests.includes(me._id)) {
+    target.friendRequests.push(me._id);
+    me.sentRequests.push(target._id);
+  }
 
   await target.save();
   await me.save();
@@ -167,10 +182,25 @@ app.put("/api/users/professional", auth, async (req, res) => {
 });
 
 // -----------------------
-// 🔥 ROUTERS (IMPORTANT)
+// POSTS ROUTES
 // -----------------------
 const postRoutes = require("./routes/postRoutes");
 app.use("/api/posts", postRoutes);
+
+// -----------------------
+// 🔥 SOCKET LOGIC
+// -----------------------
+io.on("connection", (socket) => {
+  console.log("User connected:", socket.id);
+
+  socket.on("sendMessage", (data) => {
+    io.emit("receiveMessage", data);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("User disconnected");
+  });
+});
 
 // -----------------------
 app.get("/", (req, res) => {
@@ -178,6 +208,8 @@ app.get("/", (req, res) => {
 });
 
 // -----------------------
-app.listen(PORT, () => {
+// 🔥 IMPORTANT CHANGE
+// -----------------------
+server.listen(PORT, () => {
   console.log(`Server running on port ${PORT} 🚀`);
 });
