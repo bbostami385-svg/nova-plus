@@ -5,52 +5,28 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
-// 🔥 NEW
+// 🔥 SOCKET
 const http = require("http");
 const { Server } = require("socket.io");
 
 const app = express();
 const server = http.createServer(app);
 
-const users = {}; // store online users
+// ✅ PORT
+const PORT = process.env.PORT || 5000;
 
-io.on("connection", (socket) => {
-  console.log("User connected:", socket.id);
-
-  // user register
-  socket.on("addUser", (userId) => {
-    users[userId] = socket.id;
-    io.emit("getUsers", Object.keys(users));
-  });
-
-  // send message
-  socket.on("sendMessage", (data) => {
-    const receiverSocket = users[data.receiverId];
-
-    if (receiverSocket) {
-      io.to(receiverSocket).emit("receiveMessage", data);
-    }
-  });
-
-  // typing
-  socket.on("typing", (data) => {
-    const receiverSocket = users[data.receiverId];
-
-    if (receiverSocket) {
-      io.to(receiverSocket).emit("typing", data);
-    }
-  });
-
-  socket.on("disconnect", () => {
-    for (const userId in users) {
-      if (users[userId] === socket.id) {
-        delete users[userId];
-        break;
-      }
-    }
-    io.emit("getUsers", Object.keys(users));
-  });
+// 🔥 SOCKET INIT
+const io = new Server(server, {
+  cors: {
+    origin: "*"
+  }
 });
+
+const users = {}; // online users
+
+// -----------------------
+app.use(cors());
+app.use(express.json());
 
 // -----------------------
 // MongoDB
@@ -85,6 +61,7 @@ const UserSchema = new mongoose.Schema({
 
   createdAt: { type: Date, default: Date.now }
 });
+
 const User = mongoose.model("User", UserSchema);
 
 // -----------------------
@@ -102,6 +79,49 @@ const auth = (req, res, next) => {
     res.status(401).json({ msg: "Invalid token" });
   }
 };
+
+// -----------------------
+// SOCKET LOGIC
+// -----------------------
+io.on("connection", (socket) => {
+  console.log("User connected:", socket.id);
+
+  // register user
+  socket.on("addUser", (userId) => {
+    users[userId] = socket.id;
+    io.emit("getUsers", Object.keys(users));
+  });
+
+  // send message
+  socket.on("sendMessage", (data) => {
+    const receiverSocket = users[data.receiverId];
+
+    if (receiverSocket) {
+      io.to(receiverSocket).emit("receiveMessage", data);
+    }
+  });
+
+  // typing
+  socket.on("typing", (data) => {
+    const receiverSocket = users[data.receiverId];
+
+    if (receiverSocket) {
+      io.to(receiverSocket).emit("typing", data);
+    }
+  });
+
+  // disconnect
+  socket.on("disconnect", () => {
+    for (const userId in users) {
+      if (users[userId] === socket.id) {
+        delete users[userId];
+        break;
+      }
+    }
+    io.emit("getUsers", Object.keys(users));
+    console.log("User disconnected:", socket.id);
+  });
+});
 
 // -----------------------
 // AUTH ROUTES
@@ -215,27 +235,10 @@ const postRoutes = require("./routes/postRoutes");
 app.use("/api/posts", postRoutes);
 
 // -----------------------
-// 🔥 SOCKET LOGIC
-// -----------------------
-io.on("connection", (socket) => {
-  console.log("User connected:", socket.id);
-
-  socket.on("sendMessage", (data) => {
-    io.emit("receiveMessage", data);
-  });
-
-  socket.on("disconnect", () => {
-    console.log("User disconnected");
-  });
-});
-
-// -----------------------
 app.get("/", (req, res) => {
   res.send("NovaPlus Social Backend 🚀");
 });
 
-// -----------------------
-// 🔥 IMPORTANT CHANGE
 // -----------------------
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT} 🚀`);
