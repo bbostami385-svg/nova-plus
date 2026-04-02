@@ -12,18 +12,45 @@ const { Server } = require("socket.io");
 const app = express();
 const server = http.createServer(app);
 
-// 🔥 SOCKET
-const io = new Server(server, {
-  cors: {
-    origin: "*"
-  }
+const users = {}; // store online users
+
+io.on("connection", (socket) => {
+  console.log("User connected:", socket.id);
+
+  // user register
+  socket.on("addUser", (userId) => {
+    users[userId] = socket.id;
+    io.emit("getUsers", Object.keys(users));
+  });
+
+  // send message
+  socket.on("sendMessage", (data) => {
+    const receiverSocket = users[data.receiverId];
+
+    if (receiverSocket) {
+      io.to(receiverSocket).emit("receiveMessage", data);
+    }
+  });
+
+  // typing
+  socket.on("typing", (data) => {
+    const receiverSocket = users[data.receiverId];
+
+    if (receiverSocket) {
+      io.to(receiverSocket).emit("typing", data);
+    }
+  });
+
+  socket.on("disconnect", () => {
+    for (const userId in users) {
+      if (users[userId] === socket.id) {
+        delete users[userId];
+        break;
+      }
+    }
+    io.emit("getUsers", Object.keys(users));
+  });
 });
-
-const PORT = process.env.PORT || 5000;
-
-// -----------------------
-app.use(cors());
-app.use(express.json());
 
 // -----------------------
 // MongoDB
