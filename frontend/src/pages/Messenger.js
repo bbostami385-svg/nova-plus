@@ -17,7 +17,7 @@ function Messenger() {
   const [preview, setPreview] = useState(null);
   const [typingUser, setTypingUser] = useState("");
 
-  // VIDEO CALL STATES
+  // 🔥 VIDEO
   const [stream, setStream] = useState(null);
   const [call, setCall] = useState(null);
   const [callerSignal, setCallerSignal] = useState(null);
@@ -33,32 +33,34 @@ function Messenger() {
   const chunks = useRef([]);
   const chatRef = useRef();
 
+  // -----------------------
   // LOAD FRIENDS
-  const loadFriends = async () => {
-    try {
-      const res = await fetch(`${API}/api/users/friends`, {
-        headers: { Authorization: "Bearer " + token }
-      });
-      const data = await res.json();
-      setFriends(data);
-    } catch {
-      console.log("Friend load error");
-    }
-  };
-
+  // -----------------------
   useEffect(() => {
+    const loadFriends = async () => {
+      try {
+        const res = await fetch(`${API}/api/users/friends`, {
+          headers: { Authorization: "Bearer " + token }
+        });
+        const data = await res.json();
+        setFriends(data);
+      } catch {
+        console.log("Friend load error");
+      }
+    };
     loadFriends();
   }, []);
 
+  // -----------------------
   // SOCKET
+  // -----------------------
   useEffect(() => {
     if (!myId) return;
 
     socket.emit("addUser", myId);
 
     socket.on("getUsers", (users) => {
-      const ids = users.map(u => u.userId || u);
-      setOnlineUsers(ids);
+      setOnlineUsers(users);
     });
 
     socket.on("receiveMessage", (msg) => {
@@ -70,29 +72,53 @@ function Messenger() {
       setTimeout(() => setTypingUser(""), 1000);
     });
 
-    // INCOMING CALL
+    socket.on("seen", ({ senderId }) => {
+      setMessages(prev =>
+        prev.map(m =>
+          m.senderId === senderId ? { ...m, status: "seen" } : m
+        )
+      );
+    });
+
+    // 📞 CALL
     socket.on("incomingCall", ({ from, signal }) => {
       setCall({ from });
       setCallerSignal(signal);
     });
 
-    // CALL ACCEPTED
     socket.on("callAccepted", ({ signal }) => {
       peerRef.current.signal(signal);
     });
 
+    socket.on("callEnded", () => {
+      endCall();
+    });
+
+    socket.on("callRejected", () => {
+      alert("Call rejected ❌");
+      endCall();
+    });
+
     return () => {
-      socket.off("getUsers");
-      socket.off("receiveMessage");
-      socket.off("typing");
-      socket.off("incomingCall");
-      socket.off("callAccepted");
+      socket.off();
     };
   }, [myId]);
 
-  // LOAD MESSAGES
+  // -----------------------
+  // LOAD CHAT
+  // -----------------------
   const loadMessages = async (id) => {
     setCurrentChat(id);
+
+    socket.emit("joinRoom", {
+      senderId: myId,
+      receiverId: id
+    });
+
+    socket.emit("seen", {
+      senderId: myId,
+      receiverId: id
+    });
 
     try {
       const res = await fetch(`${API}/api/messages/${id}`, {
@@ -100,38 +126,40 @@ function Messenger() {
       });
       const data = await res.json();
       setMessages(data);
-    } catch {
-      console.log("Message load error");
-    }
+    } catch {}
   };
 
+  // -----------------------
   // SCROLL
+  // -----------------------
   useEffect(() => {
     chatRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // -----------------------
   // FILE UPLOAD
+  // -----------------------
   const uploadFile = async (file) => {
     const fileRef = ref(storage, "chat/" + Date.now());
     await uploadBytes(fileRef, file);
     return await getDownloadURL(fileRef);
   };
 
+  // -----------------------
   // SEND MESSAGE
+  // -----------------------
   const sendMessage = async () => {
     if (!currentChat) return alert("Select user first");
-    if (!text && !media) return;
 
     let fileUrl = "";
-    if (media) {
-      fileUrl = await uploadFile(media);
-    }
+    if (media) fileUrl = await uploadFile(media);
 
     const msg = {
       senderId: myId,
       receiverId: currentChat,
       text,
-      media: fileUrl
+      media: fileUrl,
+      status: "sent"
     };
 
     socket.emit("sendMessage", msg);
@@ -142,7 +170,9 @@ function Messenger() {
     setPreview(null);
   };
 
+  // -----------------------
   // VOICE
+  // -----------------------
   const startRecording = async () => {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     mediaRecorder.current = new MediaRecorder(stream);
@@ -174,7 +204,9 @@ function Messenger() {
     mediaRecorder.current.stop();
   };
 
-  // VIDEO CALL START
+  // -----------------------
+  // VIDEO START
+  // -----------------------
   const startVideo = async () => {
     const mediaStream = await navigator.mediaDevices.getUserMedia({
       video: true,
@@ -185,14 +217,16 @@ function Messenger() {
     myVideo.current.srcObject = mediaStream;
   };
 
+  // -----------------------
   // CALL USER
+  // -----------------------
   const callUser = () => {
-    if (!currentChat) return alert("Select user first");
+    if (!stream) return alert("Turn on camera first");
 
     const peer = new Peer({
       initiator: true,
       trickle: false,
-      stream: stream
+      stream
     });
 
     peer.on("signal", (signal) => {
@@ -210,12 +244,14 @@ function Messenger() {
     peerRef.current = peer;
   };
 
+  // -----------------------
   // ACCEPT CALL
+  // -----------------------
   const acceptCall = () => {
     const peer = new Peer({
       initiator: false,
       trickle: false,
-      stream: stream
+      stream
     });
 
     peer.on("signal", (signal) => {
@@ -231,6 +267,18 @@ function Messenger() {
 
     peer.signal(callerSignal);
     peerRef.current = peer;
+  };
+
+  // -----------------------
+  // END CALL
+  // -----------------------
+  const endCall = () => {
+    peerRef.current?.destroy();
+    setCall(null);
+
+    if (stream) {
+      stream.getTracks().forEach(track => track.stop());
+    }
   };
 
   return (
@@ -261,10 +309,13 @@ function Messenger() {
           <div ref={chatRef}></div>
         </div>
 
-        <input value={text} onChange={(e) => {
-          setText(e.target.value);
-          socket.emit("typing", { senderId: myId, receiverId: currentChat });
-        }} />
+        <input
+          value={text}
+          onChange={(e) => {
+            setText(e.target.value);
+            socket.emit("typing", { senderId: myId, receiverId: currentChat });
+          }}
+        />
 
         <input type="file" onChange={(e) => {
           const file = e.target.files[0];
@@ -272,7 +323,7 @@ function Messenger() {
           setPreview(URL.createObjectURL(file));
         }} />
 
-        {preview && <img src={preview} width="80" />}
+        {preview && <img src={preview} width="80" alt="" />}
 
         <button onClick={sendMessage}>Send</button>
         <button onMouseDown={startRecording} onMouseUp={stopRecording}>🎤</button>
@@ -281,12 +332,17 @@ function Messenger() {
         <div>
           <button onClick={startVideo}>🎥 Camera</button>
           <button onClick={callUser}>📞 Call</button>
+          <button onClick={endCall}>❌ End</button>
         </div>
 
         {call && (
           <div>
-            <p>📞 Incoming Call from {call.from}</p>
+            <p>📞 Incoming Call</p>
             <button onClick={acceptCall}>Accept</button>
+            <button onClick={() => {
+              socket.emit("rejectCall", { to: call.from });
+              setCall(null);
+            }}>Reject</button>
           </div>
         )}
 
