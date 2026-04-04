@@ -11,32 +11,23 @@ const { Server } = require("socket.io");
 const app = express();
 const server = http.createServer(app);
 
-// -----------------------
-const PORT = process.env.PORT || 5000;
-
-// -----------------------
-// SOCKET INIT
-// -----------------------
 const io = new Server(server, {
-  cors: {
-    origin: "*"
-  }
+  cors: { origin: "*" }
 });
 
-// -----------------------
 app.use(cors());
 app.use(express.json());
 
-// -----------------------
-// MONGO DB
-// -----------------------
+// =====================
+// DB CONNECT
+// =====================
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB connected ✅"))
-  .catch(err => console.log("MongoDB error ❌", err));
+  .catch(err => console.log(err));
 
-// -----------------------
-// USER MODEL
-// -----------------------
+// =====================
+// MODELS
+// =====================
 const UserSchema = new mongoose.Schema({
   name: String,
   email: { type: String, unique: true },
@@ -46,11 +37,26 @@ const UserSchema = new mongoose.Schema({
   lastSeen: { type: Date, default: Date.now }
 });
 
-const User = mongoose.model("User", UserSchema);
+const StorySchema = new mongoose.Schema({
+  userId: String,
+  media: String,
+  text: String,
+  createdAt: { type: Date, default: Date.now }
+});
 
-// -----------------------
+const GroupSchema = new mongoose.Schema({
+  name: String,
+  members: [String],
+  createdBy: String
+});
+
+const User = mongoose.model("User", UserSchema);
+const Story = mongoose.model("Story", StorySchema);
+const Group = mongoose.model("Group", GroupSchema);
+
+// =====================
 // AUTH MIDDLEWARE
-// -----------------------
+// =====================
 const auth = (req, res, next) => {
   const token = req.header("Authorization")?.split(" ")[1];
   if (!token) return res.status(401).json({ msg: "No token" });
@@ -64,84 +70,64 @@ const auth = (req, res, next) => {
   }
 };
 
-// -----------------------
+// =====================
 // ONLINE USERS
-// -----------------------
+// =====================
 const onlineUsers = {};
 
-// -----------------------
-// SOCKET.IO MAIN SYSTEM
-// -----------------------
+// =====================
+// SOCKET.IO
+// =====================
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
 
-  // ✅ ADD USER
   socket.on("addUser", async (userId) => {
     onlineUsers[userId] = socket.id;
 
-    await User.findByIdAndUpdate(userId, {
-      isOnline: true
-    });
+    await User.findByIdAndUpdate(userId, { isOnline: true });
 
     io.emit("getUsers", Object.keys(onlineUsers));
   });
 
-  // ✅ JOIN ROOM
   socket.on("joinRoom", ({ senderId, receiverId }) => {
     const roomId = [senderId, receiverId].sort().join("_");
     socket.join(roomId);
   });
 
-  // ✅ SEND MESSAGE
   socket.on("sendMessage", (data) => {
     const roomId = [data.senderId, data.receiverId].sort().join("_");
-
-    io.to(roomId).emit("receiveMessage", {
-      ...data,
-      status: "delivered"
-    });
+    io.to(roomId).emit("receiveMessage", data);
   });
 
-  // ✅ TYPING
+  socket.on("sendGroupMessage", (data) => {
+    io.to(data.groupId).emit("receiveGroupMessage", data);
+  });
+
   socket.on("typing", (data) => {
     const roomId = [data.senderId, data.receiverId].sort().join("_");
     socket.to(roomId).emit("typing", data);
   });
 
-  // ✅ SEEN
-  socket.on("seen", (data) => {
-    const roomId = [data.senderId, data.receiverId].sort().join("_");
-    socket.to(roomId).emit("seen", data);
-  });
-
-  // =========================
-  // 🔥 VIDEO CALL SYSTEM (FINAL)
-  // =========================
-
-  // 📞 CALL USER
+  // =====================
+  // VIDEO CALL
+  // =====================
   socket.on("callUser", ({ from, to, signal }) => {
-    const toSocketId = onlineUsers[to];
-
-    if (toSocketId) {
-      io.to(toSocketId).emit("incomingCall", {
-        from,
-        signal
-      });
+    const toSocket = onlineUsers[to];
+    if (toSocket) {
+      io.to(toSocket).emit("incomingCall", { from, signal });
     }
   });
 
-  // ✅ ACCEPT CALL
   socket.on("answerCall", ({ to, signal }) => {
-    const toSocketId = onlineUsers[to];
-
-    if (toSocketId) {
-      io.to(toSocketId).emit("callAccepted", {
-        signal
-      });
+    const toSocket = onlineUsers[to];
+    if (toSocket) {
+      io.to(toSocket).emit("callAccepted", { signal });
     }
   });
 
-  // ❌ DISCONNECT
+  // =====================
+  // DISCONNECT
+  // =====================
   socket.on("disconnect", async () => {
     for (const userId in onlineUsers) {
       if (onlineUsers[userId] === socket.id) {
@@ -151,19 +137,16 @@ io.on("connection", (socket) => {
           isOnline: false,
           lastSeen: new Date()
         });
-
-        break;
       }
     }
 
     io.emit("getUsers", Object.keys(onlineUsers));
-    console.log("User disconnected:", socket.id);
   });
 });
 
-// -----------------------
+// =====================
 // AUTH ROUTES
-// -----------------------
+// =====================
 app.post("/api/auth/signup", async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -173,18 +156,12 @@ app.post("/api/auth/signup", async (req, res) => {
 
     const hash = await bcrypt.hash(password, 10);
 
-    const user = new User({
-      name,
-      email,
-      password: hash
-    });
-
+    const user = new User({ name, email, password: hash });
     await user.save();
 
-    res.json({ msg: "Signup success", user });
-
+    res.json(user);
   } catch {
-    res.status(500).json({ msg: "Server error" });
+    res.status(500).json({ msg: "Error" });
   }
 });
 
@@ -204,16 +181,15 @@ app.post("/api/auth/login", async (req, res) => {
       { expiresIn: "7d" }
     );
 
-    res.json({ msg: "Login success", token, user });
-
+    res.json({ token, user });
   } catch {
-    res.status(500).json({ msg: "Server error" });
+    res.status(500).json({ msg: "Error" });
   }
 });
 
-// -----------------------
-// FRIENDS API
-// -----------------------
+// =====================
+// FRIENDS
+// =====================
 app.get("/api/users/friends", auth, async (req, res) => {
   const me = await User.findById(req.user.id);
 
@@ -224,12 +200,58 @@ app.get("/api/users/friends", auth, async (req, res) => {
   res.json(friends);
 });
 
-// -----------------------
-app.get("/", (req, res) => {
-  res.send("NovaPlus Backend 🚀");
+// =====================
+// GROUPS
+// =====================
+app.post("/api/groups", auth, async (req, res) => {
+  const group = new Group({
+    name: req.body.name,
+    members: [...req.body.members, req.user.id],
+    createdBy: req.user.id
+  });
+
+  await group.save();
+  res.json(group);
 });
 
-// -----------------------
-server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT} 🚀`);
+app.get("/api/groups", auth, async (req, res) => {
+  const groups = await Group.find({
+    members: req.user.id
+  });
+
+  res.json(groups);
+});
+
+// =====================
+// STORIES
+// =====================
+app.post("/api/story", auth, async (req, res) => {
+  const { media, text } = req.body;
+
+  const story = new Story({
+    userId: req.user.id,
+    media,
+    text
+  });
+
+  await story.save();
+  res.json(story);
+});
+
+app.get("/api/story", auth, async (req, res) => {
+  const stories = await Story.find()
+    .sort({ createdAt: -1 })
+    .limit(50);
+
+  res.json(stories);
+});
+
+// =====================
+app.get("/", (req, res) => {
+  res.send("Messenger Backend Running 🚀");
+});
+
+// =====================
+server.listen(process.env.PORT || 5000, () => {
+  console.log("Server running 🚀");
 });
