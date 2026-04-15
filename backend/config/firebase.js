@@ -48,6 +48,9 @@ const verifyFirebaseToken = async (token) => {
   }
 };
 
+// Alias for backward compatibility
+const verifyFirebaseAuth = verifyFirebaseToken;
+
 // Get Firebase user
 const getFirebaseUser = async (uid) => {
   try {
@@ -58,4 +61,4 @@ const getFirebaseUser = async (uid) => {
   }
 };
 
-export { initializeFirebase, verifyFirebaseToken, getFirebaseUser };
+export { initializeFirebase, verifyFirebaseToken, verifyFirebaseAuth, getFirebaseUser };
