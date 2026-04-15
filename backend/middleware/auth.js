@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
-import { verifyFirebaseToken } from '../config/firebase.js';
+import { verifyFirebaseAuth as verifyFirebaseToken } from '../config/firebase.js';
 
 // Verify JWT Token
 export const verifyToken = (req, res, next) => {
@@ -191,7 +191,7 @@ export const rateLimit = (maxRequests = 100, windowMs = 900000) => {
   };
 };
 
-// ✅ ONLY FIX ADDED (NO OTHER CHANGE)
+// alias fix (no crash)
 export const authenticate = verifyToken;
 
 export default {
