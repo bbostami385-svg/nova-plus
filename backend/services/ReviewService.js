@@ -1,7 +1,7 @@
-const Review = require('../models/Review');
-const Product = require('../models/Product');
-const Order = require('../models/Order');
-const ProductService = require('./ProductService');
+import Review from '../models/Review.js';
+import Product from '../models/Product.js';
+import Order from '../models/Order.js';
+import ProductService from './ProductService.js';
 
 class ReviewService {
   // Create a review
@@ -302,4 +302,4 @@ class ReviewService {
   }
 }
 
-module.exports = new ReviewService();
+export default new ReviewService();

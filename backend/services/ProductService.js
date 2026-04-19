@@ -1,5 +1,6 @@
-const Product = require('../models/Product');
-const User = require('../models/User');
+import Product from '../models/Product.js';
+import User from '../models/User.js';
+import Review from '../models/Review.js';
 
 class ProductService {
   // Create a new product
@@ -295,7 +296,6 @@ class ProductService {
   // Update product rating
   async updateProductRating(productId) {
     try {
-      const Review = require('../models/Review');
       const reviews = await Review.find({
         productId,
         status: 'approved',
@@ -349,4 +349,4 @@ class ProductService {
   }
 }
 
-module.exports = new ProductService();
+export default new ProductService();

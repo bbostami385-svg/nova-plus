@@ -1,7 +1,7 @@
-const Payment = require('../models/Payment');
-const Order = require('../models/Order');
-const User = require('../models/User');
-const crypto = require('crypto');
+import Payment from '../models/Payment.js';
+import Order from '../models/Order.js';
+import User from '../models/User.js';
+import crypto from 'crypto';
 
 class PaymentService {
   constructor() {
@@ -394,4 +394,4 @@ class PaymentService {
   }
 }
 
-module.exports = new PaymentService();
+export default new PaymentService();
