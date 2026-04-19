@@ -1,8 +1,8 @@
-const Order = require('../models/Order');
-const Product = require('../models/Product');
-const Payment = require('../models/Payment');
-const ProductService = require('./ProductService');
-const crypto = require('crypto');
+import Order from '../models/Order.js';
+import Product from '../models/Product.js';
+import Payment from '../models/Payment.js';
+import ProductService from './ProductService.js';
+import crypto from 'crypto';
 
 class OrderService {
   // Generate unique order ID

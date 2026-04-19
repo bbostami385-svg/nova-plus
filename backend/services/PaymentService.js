@@ -2,6 +2,7 @@ import Payment from '../models/Payment.js';
 import Order from '../models/Order.js';
 import User from '../models/User.js';
 import crypto from 'crypto';
+import Stripe from 'stripe';
 
 class PaymentService {
   constructor() {
@@ -12,8 +13,7 @@ class PaymentService {
   // Initialize Stripe with API key
   initializeStripe(apiKey) {
     try {
-      const stripe = require('stripe');
-      this.stripe = stripe(apiKey);
+      this.stripe = Stripe(apiKey);
     } catch (error) {
       console.error('Failed to initialize Stripe:', error);
     }

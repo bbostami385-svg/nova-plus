@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const paymentSchema = new mongoose.Schema(
   {
@@ -147,4 +147,4 @@ paymentSchema.virtual('totalRefunded').get(function () {
   }, 0);
 });
 
-module.exports = mongoose.model('Payment', paymentSchema);
+export default mongoose.model('Payment', paymentSchema);
