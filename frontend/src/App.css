@@ -1,0 +1,79 @@
+.app {
+  min-height: 100vh;
+  background-color: #f0f2f5;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.header {
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 15px 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+  color: #1877f2;
+}
+
+.nav {
+  display: flex;
+  gap: 30px;
+  list-style: none;
+}
+
+.nav a {
+  text-decoration: none;
+  color: #65676b;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.nav a:hover {
+  color: #1877f2;
+}
+
+.button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.button-primary {
+  background-color: #1877f2;
+  color: white;
+}
+
+.button-primary:hover {
+  background-color: #165ec7;
+}
+
+.button-secondary {
+  background-color: #e4e6eb;
+  color: #000;
+}
+
+.button-secondary:hover {
+  background-color: #ccc;
+}
