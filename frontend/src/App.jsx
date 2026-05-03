@@ -7,6 +7,7 @@ import './App.css';
 import Home from './pages/Home';
 import Feed from './pages/Feed';
 import Profile from './pages/Profile';
+import UserProfile from './pages/UserProfile';
 import Messages from './pages/Messages';
 import Marketplace from './pages/Marketplace';
 import Login from './pages/Login';
@@ -53,12 +54,12 @@ function App() {
             <Route path="/profile/:userId" element={<Profile />} />
             <Route path="/messages" element={<Messages />} />
             <Route path="/marketplace" element={<Marketplace />} />
-          </Routes>
-        ) : (
+          </Routes>        ) : (
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<SignUp />} />
+            <Route path="/user/:userId" element={<UserProfile />} />
           </Routes>
         )
       </div>
