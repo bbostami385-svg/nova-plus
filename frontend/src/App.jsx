@@ -11,6 +11,7 @@ import UserProfile from './pages/UserProfile';
 import Messages from './pages/Messages';
 import Notifications from './pages/Notifications';
 import Search from './pages/Search';
+import Dashboard from './pages/Dashboard';
 import Marketplace from './pages/Marketplace';
 import Login from './pages/Login';
 import SignUp from './pages/SignUp';
@@ -57,6 +58,7 @@ function App() {
             <Route path="/messages" element={<Messages />} />
             <Route path="/notifications" element={<Notifications />} />
             <Route path="/search" element={<Search />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/marketplace" element={<Marketplace />} />
           </Routes>        ) : (
           <Routes>
