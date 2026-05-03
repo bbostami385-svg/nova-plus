@@ -498,3 +498,284 @@
   height: 100vh;
   font-size: 24px;
 }
+
+
+/* Notifications Page Styles */
+.notifications {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f0f2f5 0%, #e8eaed 100%);
+  padding: 20px 0;
+}
+
+.notifications-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.notifications-header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.notification-filters {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.filter-btn {
+  padding: 8px 16px;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.filter-btn.active {
+  background: #1877f2;
+  color: white;
+  border-color: #1877f2;
+}
+
+.filter-btn:hover {
+  border-color: #1877f2;
+}
+
+.notifications-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.notification-item {
+  background: white;
+  padding: 16px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-left: 4px solid transparent;
+}
+
+.notification-item:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.notification-item.unread {
+  background: #f0f7ff;
+  border-left-color: #1877f2;
+}
+
+.notification-icon {
+  font-size: 24px;
+  min-width: 40px;
+  text-align: center;
+}
+
+.notification-content {
+  flex: 1;
+}
+
+.notification-message {
+  font-size: 14px;
+  font-weight: 500;
+  margin: 0 0 4px 0;
+}
+
+.notification-time {
+  font-size: 12px;
+  color: #65676b;
+}
+
+.unread-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #1877f2;
+}
+
+/* Search Page Styles */
+.search-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f0f2f5 0%, #e8eaed 100%);
+  padding: 20px 0;
+}
+
+.search-header {
+  margin-bottom: 32px;
+}
+
+.search-form {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.search-form input {
+  flex: 1;
+  padding: 12px 16px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.search-form input:focus {
+  outline: none;
+  border-color: #1877f2;
+  box-shadow: 0 0 0 2px rgba(24, 119, 242, 0.1);
+}
+
+.search-form button {
+  padding: 12px 24px;
+}
+
+.search-filters {
+  display: flex;
+  gap: 12px;
+}
+
+.search-results {
+  margin-top: 24px;
+}
+
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+.result-card {
+  background: white;
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.result-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.user-card {
+  text-align: center;
+}
+
+.result-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #1877f2;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: bold;
+  margin: 0 auto 12px;
+}
+
+.result-card h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 4px 0;
+}
+
+.username {
+  color: #65676b;
+  font-size: 13px;
+  margin: 0 0 8px 0;
+}
+
+.bio {
+  color: #65676b;
+  font-size: 13px;
+  margin: 0 0 12px 0;
+  line-height: 1.4;
+}
+
+.user-stats,
+.post-stats,
+.community-stats {
+  font-size: 12px;
+  color: #65676b;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.post-card {
+  text-align: left;
+}
+
+.post-author {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.author-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #1877f2;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.author-name {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.post-content {
+  font-size: 13px;
+  line-height: 1.4;
+  margin: 0 0 12px 0;
+  color: #000;
+}
+
+.post-stats {
+  justify-content: flex-start;
+}
+
+.community-card {
+  text-align: left;
+}
+
+.community-card h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+}
+
+.community-card .description {
+  font-size: 13px;
+  color: #65676b;
+  margin: 0 0 12px 0;
+  line-height: 1.4;
+}
+
+.community-stats {
+  justify-content: flex-start;
+  margin-bottom: 12px;
+}
+
+.community-card button {
+  width: 100%;
+}
