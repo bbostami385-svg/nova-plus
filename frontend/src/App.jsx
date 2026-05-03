@@ -10,6 +10,7 @@ import Profile from './pages/Profile';
 import Messages from './pages/Messages';
 import Marketplace from './pages/Marketplace';
 import Login from './pages/Login';
+import SignUp from './pages/SignUp';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -57,8 +58,9 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<SignUp />} />
           </Routes>
-        )}
+        )
       </div>
     </Router>
   );
