@@ -6,7 +6,7 @@ import morgan from 'morgan';
 import http from 'http';
 import dotenv from 'dotenv';
 import { connectDB } from './config/database.js';
-import initializeFirebaseAdmin from './config/firebaseInit.js';
+import initializeFirebaseAdmin from './config/firebaseSimple.js';
 import { initializeSocket } from './config/socket.js';
 import { errorHandler, notFound } from './middleware/errorHandler.js';
 import { rateLimit } from './middleware/auth.js';
